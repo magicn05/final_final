@@ -13,7 +13,7 @@ using namespace std;
 int text_reader(int sd, int n, data_Manager &d_manager, data* data );
 int text_writer(int sd, int n, data_Manager &d_manager);
 
-int board(int sd, data_Manager &d_manager) {
+int board(int sd, data_Manager &d_manager ) {
   int end_flag = 0;
   string temp;
   char recv_buf[2048];
