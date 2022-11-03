@@ -57,3 +57,11 @@ void data::add_reply(string reply_text){
   replyno++;
 }
 
+int data::get_replyno(){
+  return this->replyno;
+}
+
+string data::get_reply(int i)
+{
+  return reply_list[i];
+}

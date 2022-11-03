@@ -12,8 +12,8 @@
 using namespace std;
 
 int text_reader(int sd, int selection, data_Manager &d_manager, data* temp_data) {
-  
-  string temp;
+  cout << temp_data->get_contents() << endl;
+  string temp, reply;
   char buf[1024];
   char recv_buf[1024];
   int a;
@@ -22,18 +22,20 @@ int text_reader(int sd, int selection, data_Manager &d_manager, data* temp_data)
   send(sd, buf, strlen(buf), 0);
   usleep(0.5);
   cout << "selection : " << selection << endl;
-
-  int n ;
+  int n;
+  int no ;
   for(int i=0; i<d_manager.get_data_cnt(); i++){
     if ((d_manager.get_data_postno(i)) == selection){
-      n = i;
+      no = i;
     }
   }
 
-  cout << "n : " << n << endl;
-
+  
   while (end_flag != 1) {
-
+    usleep(0.5);  
+    sprintf(buf, "%s", "WINDOW");
+    send(sd, buf, strlen(buf), 0);
+    usleep(0.5);  
     sprintf(buf, "%s",
             "=================================================================="
             "===============\n");
@@ -41,11 +43,11 @@ int text_reader(int sd, int selection, data_Manager &d_manager, data* temp_data)
     memset(buf, 0, sizeof(buf));
 
     sprintf(buf, "%s",
-            "Title : ");
+            "Title : "); //////////////////////////// Title
     send(sd, buf, strlen(buf), 0);
     memset(buf, 0, sizeof(buf));
 
-    temp = "            " + d_manager.get_data_title(n);
+    temp = "            " + d_manager.get_data_title(no);
     temp = temp + '\n';
     strcpy(buf, temp.c_str());
     send(sd, buf, strlen(buf), 0);
@@ -56,10 +58,10 @@ int text_reader(int sd, int selection, data_Manager &d_manager, data* temp_data)
     temp.clear();
     send(sd, buf, strlen(buf), 0);
     sprintf(buf, "%s",
-            "Written by : ");
+            "Written by : "); /////////////////////////// Written by
     send(sd, buf, strlen(buf), 0);
     memset(buf, 0, sizeof(buf));
-    temp = "            " + d_manager.get_data_owner(n);
+    temp = "            " + d_manager.get_data_owner(no);
     temp = temp + '\n';
     strcpy(buf, temp.c_str());
     send(sd, buf, strlen(buf), 0);
@@ -70,21 +72,37 @@ int text_reader(int sd, int selection, data_Manager &d_manager, data* temp_data)
     send(sd, buf, strlen(buf), 0);
     temp.clear();
 
-    temp = d_manager.get_data_contents(n);
+    temp = d_manager.get_data_contents(no);
     temp = temp + '\n';
     temp = temp + '\n';
     //buf[temp.size()] = '\n';
     //buf[temp.size()] = '\n';
     
     strcpy(buf, temp.c_str());
-    send(sd, buf, strlen(buf), 0);
+    send(sd, buf, strlen(buf), 0); //////////////////////////// Contents
     memset(buf, 0, sizeof(buf));
     sprintf(buf, "%s",
             "=================================================================="
             "===============\n");
     send(sd, buf, strlen(buf), 0);
     temp.clear();
-    d_manager.get_data_owner(n);
+    sprintf(buf, "%s", "Replies : \n"); ///////////////////////////// Replies
+    send(sd, buf, strlen(buf), 0);
+    sprintf(buf, "%s",
+            "=================================================================="
+            "===============\n");
+    send(sd, buf, strlen(buf), 0);
+    cout << "temp_data cnt : " << temp_data->get_replyno() << endl;
+    for (int m=0; m<temp_data->get_replyno(); m++){
+      reply = temp_data->get_reply(m);
+      reply = reply + '\n';
+      cout << "reply : " << reply << endl;
+      
+      strcpy(buf, reply.c_str());
+      send(sd, buf, strlen(buf), 0);
+      memset(buf, 0, sizeof(buf));
+      reply.clear();
+    }
 
     sprintf(buf, "%s", "[1]. 추천하기\n");
     send(sd, buf, strlen(buf), 0);
@@ -109,10 +127,11 @@ int text_reader(int sd, int selection, data_Manager &d_manager, data* temp_data)
       temp.clear();
       sprintf(buf, "%s", "댓글을 입력하세요 >> ");
       send(sd, buf, strlen(buf), 0);
+      memset(recv_buf,0,sizeof(recv_buf));
       n = recv(sd, recv_buf, sizeof(recv_buf), 0);
       temp = recv_buf;
-      cout << temp_data->get_contents() << endl;
-      //d_manager.put_data_reply(n, temp);
+      temp_data->add_reply(temp);
+      temp.clear();
       usleep(0.5);
       break;
 

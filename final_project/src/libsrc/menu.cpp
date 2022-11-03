@@ -10,7 +10,8 @@
 #include "menu.h"
 #include "data.h"
 #include "user.h"
-#include "manager.h"
+#include "user_manager.h"
+#include "data_manager.h"
 
 int menuCreate(LPMENU* lppRet)
 {

@@ -1,7 +1,8 @@
 #include "profile.h"
 #include "data.h"
 #include "user.h"
-#include "manager.h"
+#include "user_manager.h"
+#include "data_manager.h"
 #define MENU_MAGIC_CODE	0X4D45E55
 
 #define 	ERR_MENU_OK	0

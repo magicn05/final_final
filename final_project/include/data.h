@@ -19,14 +19,16 @@ class data{
   public:
   data();
   data(string data_title, string data_date, string data_owner, string data_passwd, string contents, int postno);
-  ~data();
+  int get_postno();
+  void add_reply(string reply_text);
+  int get_replyno();
   string get_title();
   string get_date();
   string get_owner();
   string get_passwd();
   string get_contents();  
-  int get_postno();
-  void add_reply(string reply_text);
+  string get_reply(int i);
+  ~data();
 };
 
 #endif

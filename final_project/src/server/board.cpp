@@ -10,10 +10,11 @@
 #include <unistd.h>
 using namespace std;
 
-int text_reader(int sd, int n, data_Manager &d_manager, data* data );
-int text_writer(int sd, int n, data_Manager &d_manager);
+int text_reader(int sd, int n, data_Manager &d_manager, data* temp_data);
+int text_writer(int sd, data_Manager &d_manager);
 
 int board(int sd, data_Manager &d_manager ) {
+  data* temp_data;
   int end_flag = 0;
   string temp;
   char recv_buf[2048];
@@ -84,19 +85,28 @@ int board(int sd, data_Manager &d_manager ) {
       break;
 
     case 1: //긁 일기 + 댓글 작성
+          int select;
           sprintf(buf, "%s", "조회하고 싶은 글의 번호를 입력하세요 >> ");
           send(sd, buf, strlen(buf), 0);
           n = recv(sd, recv_buf, sizeof(recv_buf), 0);
           a = atoi(recv_buf);
-          data* temp_data = d_manager.data_list[a];
+
+          for (int i = 0; i < d_manager.get_data_cnt(); i++) {
+            if ((d_manager.get_data_postno(i)) == a) {
+              select = i;
+            }
+          }
+
+          temp_data = d_manager.data_list[select];
           text_reader(sd, a, d_manager, temp_data);
+          memset(recv_buf, 0, sizeof(recv_buf));
       break;
 
     case 2: // 새글 작성
           sprintf(buf, "%s", "새글을 작성하시겠습니까? [Y/n] ");
           send(sd, buf, strlen(buf), 0);
           n = recv(sd, recv_buf, sizeof(recv_buf), 0);
-          text_writer(sd, n, d_manager);
+          text_writer(sd, d_manager);
       break;
 
     case 3: //
