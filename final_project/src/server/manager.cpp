@@ -4,7 +4,8 @@
 #include "data_manager.h"
 #include "user.h"
 #include "data.h"
-
+#include "file_manager.h"
+#include "myfile.h"
 using namespace std;
 
 user_Manager::user_Manager(){
@@ -99,4 +100,45 @@ void data_Manager::put_data_reply(int n, string reply){
 
 void data_Manager::down_data_cnt(){
   this->data_cnt = this->data_cnt - 1;
+}
+
+file_Manager::file_Manager(){
+  file_cnt = 0;
+}
+
+file_Manager::~file_Manager(){
+
+}
+
+void file_Manager::add_file(myfile* myfile){
+  file_list.push_back(myfile);
+  file_cnt++;
+}
+
+int file_Manager::get_file_cnt(){
+  return file_cnt;
+}
+
+int file_Manager::get_file_postno(int i){
+  return file_list[i]->get_file_no();
+}
+
+string file_Manager::get_file_title(int i){
+  return file_list[i]->get_file_name();
+}
+
+string file_Manager::get_file_passwd(int i){
+  return file_list[i]->get_file_pin();
+}
+
+int file_Manager::get_file_size_(int i){
+  return file_list[i]->get_file_size();
+}
+
+void file_Manager::list_clear(){
+  file_list.clear();
+  file_cnt = 0;
+  //f_no = 0;
+
+
 }

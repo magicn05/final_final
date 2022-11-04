@@ -4,7 +4,7 @@ CXXFLAGS = -fPIC -c  -g
 LDFLAGS = -L../libsrc -lmenu -lhash -lpthread -ldl
 #LDFLAGS = -L../../lib -lmenu -lprofile -lhash -lio  -lpthread
 OBJS = add.o sub.o board.o
-OBJ1 = server.o user.o manager.o data.o board.o text_reader.o text_writer.o
+OBJ1 = server.o user.o manager.o data.o board.o text_reader.o text_writer.o download.o myfile.o
 
 all: server libadd.so libsub.so libboard.so
 

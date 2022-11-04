@@ -17,19 +17,22 @@
 #include "data.h"
 #include "user_manager.h"
 #include "data_manager.h"
-
+#include "myfile.h"
+#include "file_manager.h"
 
 #define MAX_DATA_SIZE 1024
 using namespace std;
 
 int start_menu(int sd);
 int board(int sd, data_Manager& d_manager);
+int download(int sd, data_Manager& d_manager, file_Manager& f_manager, int &f_no);
 
-int n = 20;
+int f_no = 0;
 struct sockaddr_in clientaddr;
 
 user_Manager u_manager;
 data_Manager d_manager;
+file_Manager f_manager;
 
 class Server_Manager {
 public:
@@ -44,26 +47,72 @@ public:
 
 void thread_function(int sd) {
   // load users
+  int n;
+  int a;
   int res = start_menu(sd); // 1번 , 2번의 선택..
-
+  int end_flag = 0;
+  char buf[1024];
+  char recv_buf[1024];
   if (res == 0) // 0 번 : 연결종료
     close(sd);
   else if (res == 1) { // 1번 : 게시판
-    board(sd, d_manager);
+    //여기서 게시판 , 자료실, 채팅방 선택
+    //download(sd, d_manager, f_manager, f_no);
+    while(end_flag != 1){
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s", "WINDOW");
+    send(sd, buf, strlen(buf), 0);
     
+    usleep(0.5);
     
-    
-    
-    
-    // LPMENU lpMenu;
-    // menuCreate(&lpMenu);
-    // menuRun(lpMenu, sd, d_manager);
-    // menuDestroy(lpMenu);
-    
+    sprintf(buf, "%s", "안녕하세요. 원하시는 메뉴를 선택해주세요 \n\n");
+    send(sd, buf, strlen(buf), 0);
+    memset(buf, 0, sizeof(buf));
+
+    sprintf(buf, "%s", " [1]. 게시판▦ \n\n");
+    send(sd, buf, strlen(buf), 0);
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s", " [2]. 자료실♬\n\n");
+    send(sd, buf, strlen(buf), 0);
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s", " [3]. 채팅방♥\n\n");
+    send(sd, buf, strlen(buf), 0);
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s", " [4]. 로그아웃\n\n");
+    send(sd, buf, strlen(buf), 0);
+    memset(buf, 0, sizeof(buf));
+    n = recv(sd, recv_buf, sizeof(recv_buf), 0);
+    a = atoi(recv_buf);
+    switch(a)
+    {
+      case 1: //게시판
+      board(sd, d_manager);
+      break;  
+      case 2: //자료실
+      download(sd, d_manager, f_manager, f_no);
+
+      break;
+      case 3: //채팅방
+      
+      break;
+      case 4: //로그아웃
+      end_flag = 1;
+      break;
+    }
+
+    }
+    memset(buf, 0, sizeof(buf));
+    sprintf(buf, "%s", "WINDOW");
+    send(sd, buf, strlen(buf), 0);
+    usleep(0.5);
+    sprintf(buf, "%s ", "접속이 끊어집니다. 오늘도 좋은 하루 보내세요. ~ \n\n");
+    send(sd, buf, strlen(buf), 0);
+    sleep(2);
     close(sd);
   }
   return;
 }
+
 
 int main() {
   cout << "S E R V E R          O N" << endl;
@@ -75,11 +124,11 @@ int main() {
   u_manager.add_user(new user("charles","1234","lee","010-2222-4444"));
   
   d_manager.add_data(new data("Book1", "2010-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n ",1));
-  d_manager.add_data(new data("Book2", "2012-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n ",2));
+  d_manager.add_data(new data("Book6", "2012-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n hello my name is yeppi-yeppi-yo\n ",2));
   d_manager.add_data(new data("Book3", "2011-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo",13));
-  d_manager.add_data(new data("Book4", "2011-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo",4));
-  d_manager.add_data(new data("Book5", "2011-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo",55));
-  d_manager.add_data(new data("Book6", "2011-09-10", "apple", "1234", "hello my name is yeppi-yeppi-yo",61));
+  d_manager.add_data(new data("Book6", "2011-09-10", "banana", "1234", "hello my name is yeppi-yeppi-yo",4));
+  d_manager.add_data(new data("Book3", "2011-09-10", "david", "1234", "hello my name is yeppi-yeppi-yo",55));
+  d_manager.add_data(new data("Book6", "2011-09-10", "charles", "1234", "hello my name is yeppi-yeppi-yo",61));
 
   int choice;
   int sockfd, new_fd, state;

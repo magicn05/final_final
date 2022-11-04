@@ -1,102 +1,3 @@
-// #include "macro.h"
-// #include <arpa/inet.h>
-// #include <dirent.h>
-// #include <errno.h>
-// #include <linux/unistd.h>
-// #include <netdb.h>
-// #include <netinet/in.h>
-// #include <pthread.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <sys/socket.h>
-// #include <sys/types.h>
-// #include <unistd.h>
-
-// #define BUFFER_SIZE 1024
-
-// void *writer_thread(void *arg);
-// void *reader_thread(void *arg);
-// pthread_t tid1, tid2;
-
-// int main(int argc, char *argv[]) {
-//   int sockfd, new_fd;
-//   struct sockaddr_in serv_addr;
-//   int sin_size;
-
-//   if (argc != 2) {
-//     fprintf(stderr, "Usage : ./client IP_ADDRESS\n");
-//     return 1;
-//   }
-//   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-//     perror("socket");
-//     exit(1);
-//   }
-
-//   serv_addr.sin_family = AF_INET;
-//   serv_addr.sin_port = htons(60000);
-//   serv_addr.sin_addr.s_addr = inet_addr(argv[1]);
-//   memset(&(serv_addr.sin_zero), '\0', 8);
-
-//   if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) == -1) {
-//     perror("CONNECT");
-//     return 1;
-//   }
-
-//   system("clear");
-
-//   if (pthread_create(&tid1, NULL, writer_thread, &sockfd) != 0) {
-//     perror("pthread_create");
-//   }
-//   if (pthread_create(&tid2, NULL, reader_thread, &sockfd) != 0) {
-//     perror("pthread_create");
-//   }
-
-//   pthread_join(tid1, NULL);
-
-//   close(sockfd);
-
-//   return 0;
-// }
-
-// void *reader_thread(void *arg) {
-//   int sock = *((int *)arg);
-
-//   int n;
-//   char buffer[1024];
-
-//   while (1) {
-//     n = recv(sock, buffer, 512, 0);
-//     if (n <= 0) {
-//       printf("\n서버 연결 끊김\n");
-//       break;
-//     }
-//     buffer[n] = '\0';
-
-//     printf("%s", buffer);
-//     fflush(stdout);
-//   }
-//   pthread_cancel(tid1);
-//   pthread_exit(NULL);
-// }
-
-// void *writer_thread(void *arg) {
-//   int sock = *((int *)arg);
-
-//   int n;
-//   char buffer[1024];
-
-//   while (1) {
-//     fgets(buffer, 1024, stdin);
-//     n = strlen(buffer);
-//     buffer[n - 1] = '\0';
-//     if (!strcmp(buffer, "/q"))
-//       break;
-//     send(sock, buffer, n, 0);
-//   }
-//   pthread_cancel(tid2);
-//   pthread_exit(NULL);
-// }
 // Client
 #include <arpa/inet.h>
 #include <error.h>
@@ -111,7 +12,8 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <cstring>
-
+#include <string>
+#include <fstream>
 #define MAX_DATA_SIZE 2048
 
 using namespace std;
@@ -120,10 +22,16 @@ pthread_t tid1, tid2;
 
 
 void *recv_thread(void *arg) {
+  FILE* fp = NULL;
+  string file_add;
+  string temp;
+  string temp_temp;
+  char download_buf[1024];
   int new_fd = *((int *)arg);
   char recv_msg[MAX_DATA_SIZE];
   int n;
   while (1) {
+    
     n = recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
     if (n<=0){
     cout << "Disconnected from server" << endl;
@@ -134,6 +42,26 @@ void *recv_thread(void *arg) {
       cout << endl;
       system("clear");
       
+    }
+    else if (strcmp(recv_msg, "DOWNLOAD") == 0){ ///// 다운로드 준비 시작 /////
+      
+      cout << endl;
+      memset(recv_msg,0,sizeof(recv_msg));
+      n = recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
+      temp.clear();
+      temp = recv_msg;
+      cout << "temp : " << temp << endl;
+      file_add = "/home/mobis/Public/client_files/";
+      file_add = file_add + temp + "_copy";
+      
+      ofstream fdest(file_add, ios::out | ios::binary);
+      memset(recv_msg,0,sizeof(recv_msg));
+      cout << "file name : " << file_add << endl;
+      //while(1){          
+      n = recv(new_fd, recv_msg, MAX_DATA_SIZE, 0);
+      fdest.write(recv_msg,n);
+      fdest.close();
+
     }
     else 
       cout << recv_msg;
