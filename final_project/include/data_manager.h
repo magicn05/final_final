@@ -24,6 +24,7 @@ public:
   int get_data_cnt();
   int get_data_postno(int n);
   void put_data_reply(int n, string reply);
+  void down_data_cnt();
   
   
 };

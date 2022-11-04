@@ -63,13 +63,13 @@ int board(int sd, data_Manager &d_manager ) {
     usleep(0.5);
     sprintf(buf, "%s", "[0]. 새로고침\n");
     send(sd, buf, strlen(buf), 0);
-    sprintf(buf, "%s", "[1]. 글읽기\n");
+    sprintf(buf, "%s", "[1]. 글 읽기\n");
     send(sd, buf, strlen(buf), 0);
-    sprintf(buf, "%s", "[2]. 새글작성\n");
+    sprintf(buf, "%s", "[2]. 글 작성\n");
     send(sd, buf, strlen(buf), 0);
-    sprintf(buf, "%s", "[3]. 내글삭제\n");
+    sprintf(buf, "%s", "[3]. 글 삭제\n");
     send(sd, buf, strlen(buf), 0);
-    sprintf(buf, "%s", "[4]. 검색\n");
+    sprintf(buf, "%s", "[4]. 글 검색\n");
     send(sd, buf, strlen(buf), 0);
     sprintf(buf, "%s", "[5]. 나가기\n");
     send(sd, buf, strlen(buf), 0);
@@ -110,12 +110,21 @@ int board(int sd, data_Manager &d_manager ) {
       break;
 
     case 3: //
+        memset(recv_buf, 0, sizeof(recv_buf));
         sprintf(buf, "%s", "삭제하고 싶은 글의 번호를 입력하세요");
         send(sd, buf, strlen(buf), 0);
-        sprintf(buf, "%s", "비밀번호를 알아야 합니다.");
-        send(sd, buf, strlen(buf), 0);
+        // sprintf(buf, "%s", "남의글을 지울때는 비밀번호를 알아야 합니다.");
+        // send(sd, buf, strlen(buf), 0);
         n = recv(sd, recv_buf, sizeof(recv_buf), 0);
-
+        a = atoi(recv_buf);
+        for (int i = 0; i < d_manager.get_data_cnt(); i++) {
+          if ((d_manager.get_data_postno(i)) == a) {
+            select = i;
+          }
+        }
+        (d_manager.data_list).erase((d_manager.data_list).begin()+select);
+        d_manager.down_data_cnt();
+        
       break;
 
     case 4:

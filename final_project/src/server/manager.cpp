@@ -96,3 +96,7 @@ int data_Manager::get_data_postno(int n){
 void data_Manager::put_data_reply(int n, string reply){
   data_list[n]->add_reply(reply);
 }
+
+void data_Manager::down_data_cnt(){
+  this->data_cnt = this->data_cnt - 1;
+}
